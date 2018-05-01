@@ -5,6 +5,7 @@ public class LugaresEncontrados extends BasicModel{
     private String id;
     private String name;
     private String status;
+    private String address;
 
     public String getId() {
         return id;
@@ -28,5 +29,13 @@ public class LugaresEncontrados extends BasicModel{
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

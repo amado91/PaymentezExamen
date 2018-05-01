@@ -12,14 +12,20 @@ import android.location.LocationManager;
 import android.location.LocationProvider;
 import android.provider.Settings;
 import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.juanamado.examen.commons.Utils;
 import com.example.juanamado.examen.delegados.MainDelegate;
+import com.example.juanamado.examen.fragmentos.Detalle;
 import com.example.juanamado.examen.modelos.LugaresEncontrados;
 import com.example.juanamado.examen.modelos.TodosLosLugares;
 import com.example.juanamado.examen.adapters.*;
@@ -38,6 +44,25 @@ public class MainActivity extends AppCompatActivity {
     private int id =0;
     private ListView bussinesList;
     private ArrayList<LugaresEncontrados> allBussines = new ArrayList<LugaresEncontrados>();
+
+    private String name;
+    private String address;
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
 
     MainDelegate mainActivityDelegate;
 
@@ -63,6 +88,14 @@ public class MainActivity extends AppCompatActivity {
         } else {
             locationStart();
         }
+
+        bussinesList.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.e("Error",""+ position);
+                openDetailFragment(position);
+            }
+        });
     }
 
     private void locationStart() {
@@ -180,28 +213,51 @@ public class MainActivity extends AppCompatActivity {
     public void onSuccessLogin(TodosLosLugares data){
         for (int i=0; i<data.getAllBussines().size();i++){
             String name = data.getAllBussines().get(i).getName();
+            String address = data.getAllBussines().get(i).getAddress();
             String id = String.valueOf(i);
-            writeBussines(name, id);
-
+            writeBussines(name, id, address);
         }
     }
 
     public void onErrorData(String message){
-
+        Toast.makeText(this, String.format("%s", message),Toast.LENGTH_LONG).show();
+        finish();
     }
 
     public void onError(String message){
-
+        Toast.makeText(this, String.format("%s", message),Toast.LENGTH_LONG).show();
+        finish();
     }
 
-    public void writeBussines(String name, String id){
+    public void writeBussines(String name, String id, String address){
         LugaresEncontrados lugaresEncontrados = new LugaresEncontrados();
         lugaresEncontrados.setId(id);
         lugaresEncontrados.setName(name);
+        lugaresEncontrados.setAddress(address);
 
         allBussines.add(lugaresEncontrados);
         ListAdapter listAdapter = new ListAdapter(this, allBussines);
         bussinesList.setAdapter(listAdapter);
+
+    }
+    @Override
+    public void onBackPressed() {
+        FragmentManager fm = getSupportFragmentManager();
+        if (fm.getBackStackEntryCount() > 0) {
+            fm.popBackStack();
+        }
+        else {
+            super.onBackPressed();
+        }
+    }
+
+    public void openDetailFragment(int id) {
+        Detalle myFragment = new Detalle(allBussines,id);
+        FragmentManager FM = getSupportFragmentManager();
+        FragmentTransaction FT = FM.beginTransaction();
+
+        FT.replace(R.id.contaner, myFragment).addToBackStack(null);
+        FT.commit();
 
     }
 }

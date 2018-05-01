@@ -39,6 +39,9 @@ public class Parser {
                                 bussines.setName(name);
                                 bussines.setId(String.valueOf(i));
                                 Log.e("name_bussines",name);
+                                String addres = obj.getString("vicinity");
+                                bussines.setAddress(addres);
+                                Log.e("address_bussines",addres);
                                 bussines.setStatus(status);
                                 allBusiines.add(bussines);
                             }
